@@ -26,7 +26,7 @@
 #define MODEL_LENGTH 0.27
 #define MODEL_WIDTH 0.25
 #define WHEEL_RATIO 0.04
-#define DEGTORED 0.0174533
+#define DEGTORED 0.01745329252
 
 #define MAX_MOTOR_VEL 225
 #define MIN_MOTOR_VEL 30
@@ -37,6 +37,11 @@ extern int FR_encoderPos;
 extern int FL_encoderPos;
 extern int BR_encoderPos;
 extern int BL_encoderPos;
+
+extern float FR_angelVel;
+extern float FL_angelVel;
+extern float BR_angelVel;
+extern float BL_angelVel;
 
 void doEncoderFR();
 void doEncoderFL();
@@ -61,10 +66,7 @@ class MainbotMotorDriver{
 		void view_angVel();
 		void view_encoderPos();
 			
-		float FR_angelVel;
-		float FL_angelVel;
-		float BR_angelVel;
-		float BL_angelVel;
+
 		
 
 	private:

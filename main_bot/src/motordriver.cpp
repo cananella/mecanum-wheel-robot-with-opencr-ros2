@@ -1,61 +1,76 @@
 #include "../include/motordriver.h"
 
-const float ratio = 360./90./12./2.;
-int FR_encoderPos = 0;
-int FL_encoderPos = 0;
-int BR_encoderPos = 0;
-int BL_encoderPos = 0;
+int FR_encoderPos;
+int FL_encoderPos;
+int BR_encoderPos;
+int BL_encoderPos;
 
-float FR_targetDeg = 0;
-float FL_targetDeg = 0;
-float BR_targetDeg = 0;
-float BL_targetDeg = 0;
-
-float FR_targetVel = 0;
-float FL_targetVel = 0;
-float BR_targetVel = 0;
-float BL_targetVel = 0;
-
-float l1 = MODEL_LENGTH / 2;
-float l2 = MODEL_WIDTH / 2;
-float R = WHEEL_RATIO ;
+float FR_angelVel;
+float FL_angelVel;
+float BR_angelVel;
+float BL_angelVel;
 
 
-int FR_wight=0;
-int BR_wight=0;
-int FL_wight=0;
-int BL_wight=0;
-
-float FR_angelVel = 0;
-float FL_angelVel = 0;
-float BR_angelVel = 0;
-float BL_angelVel = 0;
-
-void init_motordriver(){
-  pinMode(FR_MOTOR_DRIVER_IN1,OUTPUT);
-  pinMode(FR_MOTOR_DRIVER_IN2,OUTPUT);
-  pinMode(FL_MOTOR_DRIVER_IN3,OUTPUT);
-  pinMode(FL_MOTOR_DRIVER_IN4,OUTPUT);
-
-  pinMode(BR_MOTOR_DRIVER_IN3,OUTPUT);
-  pinMode(BR_MOTOR_DRIVER_IN4,OUTPUT);
-  pinMode(BL_MOTOR_DRIVER_IN1,OUTPUT);
-  pinMode(BL_MOTOR_DRIVER_IN2,OUTPUT);
-
-  pinMode(FR_ENCODER_PIN_C1,INPUT_PULLUP);
-  pinMode(FR_ENCODER_PIN_C2,INPUT_PULLUP);
-  pinMode(FL_ENCODER_PIN_C1,INPUT_PULLUP);
-  pinMode(FL_ENCODER_PIN_C2,INPUT_PULLUP);
+MainbotMotorDriver::MainbotMotorDriver(){
   
-  pinMode(BR_ENCODER_PIN_C1,INPUT_PULLUP);
-  pinMode(BR_ENCODER_PIN_C2,INPUT_PULLUP);
-  pinMode(BL_ENCODER_PIN_C1,INPUT_PULLUP);
-  pinMode(BL_ENCODER_PIN_C2,INPUT_PULLUP);
+	ratio = 360./90./12./2.;
+
+	FR_encoderPos = 0;
+	FL_encoderPos = 0;
+	BR_encoderPos = 0;
+	BL_encoderPos = 0;
+
+	FR_targetVel = 0;
+	FL_targetVel = 0;
+	BR_targetVel = 0;
+	BL_targetVel = 0;
+
+	l1 = MODEL_LENGTH / 2;
+	l2 = MODEL_WIDTH / 2;
+	R = WHEEL_RATIO ;
+
+
+	FR_wight=0;
+	BR_wight=0;
+	FL_wight=0;
+	BL_wight=0;
+
+	FR_angelVel = 0;
+	FL_angelVel = 0;
+	BR_angelVel = 0;
+	BL_angelVel = 0;
+
+}
+
+MainbotMotorDriver::~MainbotMotorDriver(){
+}
+
+void MainbotMotorDriver::init(){
+	pinMode(FR_MOTOR_DRIVER_IN1,OUTPUT);
+	pinMode(FR_MOTOR_DRIVER_IN2,OUTPUT);
+	pinMode(FL_MOTOR_DRIVER_IN3,OUTPUT);
+	pinMode(FL_MOTOR_DRIVER_IN4,OUTPUT);
+
+	pinMode(BR_MOTOR_DRIVER_IN3,OUTPUT);
+	pinMode(BR_MOTOR_DRIVER_IN4,OUTPUT);
+	pinMode(BL_MOTOR_DRIVER_IN1,OUTPUT);
+	pinMode(BL_MOTOR_DRIVER_IN2,OUTPUT);
+
+	pinMode(FR_ENCODER_PIN_C1,INPUT_PULLUP);
+	pinMode(FR_ENCODER_PIN_C2,INPUT_PULLUP);
+	pinMode(FL_ENCODER_PIN_C1,INPUT_PULLUP);
+	pinMode(FL_ENCODER_PIN_C2,INPUT_PULLUP);
+	
+	pinMode(BR_ENCODER_PIN_C1,INPUT_PULLUP);
+	pinMode(BR_ENCODER_PIN_C2,INPUT_PULLUP);
+	pinMode(BL_ENCODER_PIN_C1,INPUT_PULLUP);
+	pinMode(BL_ENCODER_PIN_C2,INPUT_PULLUP);
 
   attachInterrupt(digitalPinToInterrupt(FR_ENCODER_PIN_C2), doEncoderFR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(FL_ENCODER_PIN_C2), doEncoderFL, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(BR_ENCODER_PIN_C2), doEncoderBR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(BL_ENCODER_PIN_C2), doEncoderBL, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(FL_ENCODER_PIN_C2), doEncoderFL, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(BR_ENCODER_PIN_C2), doEncoderBR, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(BL_ENCODER_PIN_C2), doEncoderBL, CHANGE);
+  
 }
 
 void doEncoderFR(){
@@ -72,27 +87,27 @@ void doEncoderBL(){
 }
 
 
-void doFR_Motor(bool dir, int vel){
+void MainbotMotorDriver::doFR_Motor(bool dir, int vel){
   digitalWrite(FR_MOTOR_DRIVER_IN2, dir);
   analogWrite(FR_MOTOR_DRIVER_IN1,dir?(MAX_MOTOR_VEL-vel):vel);
 }
 
-void doFL_Motor(bool dir, int vel){
+void MainbotMotorDriver::doFL_Motor(bool dir, int vel){
   digitalWrite(FL_MOTOR_DRIVER_IN4, !dir);
   analogWrite(FL_MOTOR_DRIVER_IN3,!dir?(MAX_MOTOR_VEL-vel):vel);
 }
 
-void doBR_Motor(bool dir, int vel){
+void MainbotMotorDriver::doBR_Motor(bool dir, int vel){
   digitalWrite(BR_MOTOR_DRIVER_IN4, dir);
   analogWrite(BR_MOTOR_DRIVER_IN3,dir?(MAX_MOTOR_VEL-vel):vel);
 }
 
-void doBL_Motor(bool dir, int vel){
+void MainbotMotorDriver::doBL_Motor(bool dir, int vel){
   digitalWrite(BL_MOTOR_DRIVER_IN2, !dir);
   analogWrite(BL_MOTOR_DRIVER_IN1,!dir?(MAX_MOTOR_VEL-vel):vel);
 }
 
-float angle_vel(int *encoderPos){
+float MainbotMotorDriver::angle_vel(int *encoderPos){
   float t1=millis();
   int deg1=*encoderPos;
   delay(5);
@@ -102,7 +117,7 @@ float angle_vel(int *encoderPos){
   return angle_vel;
   }
 
-void Stop(){
+void MainbotMotorDriver::Stop(){
   digitalWrite(FR_MOTOR_DRIVER_IN2, LOW);
   analogWrite(FR_MOTOR_DRIVER_IN1,0);
   digitalWrite(FL_MOTOR_DRIVER_IN4, LOW);
@@ -118,16 +133,16 @@ void Stop(){
 }
 
 
-void control_vel(float Vx, float Vy, float W){
+void MainbotMotorDriver::control_vel(float Vx, float Vy, float W){
   //vel 0.059~0.23
   if(Vx == 0 && Vy == 0 && W == 0) {
     Stop();
   }
   else{
     BR_targetVel = (Vx - Vy - (l1+l2)*W)/R;
-    FR_targetVel = (Vx + Vy + (l1+l2)*W)/R; 
+    FR_targetVel = (Vx + Vy - (l1+l2)*W)/R; 
     FL_targetVel = (Vx - Vy + (l1+l2)*W)/R; 
-    BL_targetVel = (Vx + Vy - (l1+l2)*W)/R;  
+    BL_targetVel = (Vx + Vy + (l1+l2)*W)/R;  
   }
   bool FR_done_flag=false;
   bool FL_done_flag=false;
@@ -156,12 +171,12 @@ void control_vel(float Vx, float Vy, float W){
         FR_done_flag=true;
       }
     }
-    else if (FR_targetVel > minAngVel && !FR_done_flag){
-      if (FR_targetVel > FR_angelVel && FR_wight<105){
+    else if (FR_targetVel>minAngVel && !FR_done_flag){
+      if (FR_targetVel>FR_angelVel && FR_wight<105){
         FR_wight++;
         doFR_Motor(HIGH,MIN_MOTOR_VEL+FR_wight);
       }
-      else if(FR_targetVel + angVel_error < FR_angelVel && FR_wight>0){
+      else if(FR_targetVel + angVel_error <FR_angelVel && FR_wight>0){
         FR_wight--;
         doFR_Motor(HIGH,MIN_MOTOR_VEL+FR_wight);
       }
@@ -274,27 +289,27 @@ void control_vel(float Vx, float Vy, float W){
       BL_done_flag=true;
     }
   } 
-  //Serial.println("motordone");
+  //DEBUG_SERIAL.println("motordone");
 }
 
-void view_angVel(){
-  Serial.print("          FR_angelVel : ");
-  Serial.print(FR_angelVel);
-  Serial.print("          FL_angelVel : ");
-  Serial.print(FL_angelVel);
-  Serial.print("          BR_angelVel : ");
-  Serial.print(BR_angelVel);
-  Serial.print("          BL_angelVel : ");
-  Serial.println(BL_angelVel);
+void MainbotMotorDriver::view_angVel(){
+  DEBUG_SERIAL.print("          FR_angelVel : ");
+  DEBUG_SERIAL.print(FR_angelVel);
+  DEBUG_SERIAL.print("          FL_angelVel : ");
+  DEBUG_SERIAL.print(FL_angelVel);
+  DEBUG_SERIAL.print("          BR_angelVel : ");
+  DEBUG_SERIAL.print(BR_angelVel);
+  DEBUG_SERIAL.print("          BL_angelVel : ");
+  DEBUG_SERIAL.println(BL_angelVel);
 }
 
-void view_encoderPos(){
-  Serial.print("FR_encoderPos : ");
-  Serial.print(FR_encoderPos*ratio);
-  Serial.print("   FL_encoderPos : ");
-  Serial.print(FL_encoderPos*ratio);
-  Serial.print("   BR_encoderPos : ");
-  Serial.print(BR_encoderPos*ratio);
-  Serial.print("   BL_encoderPos : ");
-  Serial.println(BL_encoderPos*ratio);
+void MainbotMotorDriver::view_encoderPos(){
+  DEBUG_SERIAL.print("FR_encoderPos : ");
+  DEBUG_SERIAL.print(FR_encoderPos*ratio);
+  DEBUG_SERIAL.print("   FL_encoderPos : ");
+  DEBUG_SERIAL.print(FL_encoderPos*ratio);
+  DEBUG_SERIAL.print("   BR_encoderPos : ");
+  DEBUG_SERIAL.print(BR_encoderPos*ratio);
+  DEBUG_SERIAL.print("   BL_encoderPos : ");
+  DEBUG_SERIAL.println(BL_encoderPos*ratio);
 }

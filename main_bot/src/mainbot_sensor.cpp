@@ -5,6 +5,7 @@ MainbotSensor::MainbotSensor(){
 
 
 MainbotSensor::~MainbotSensor(){
+	DEBUG_SERIAL.end();
 }
 
 bool MainbotSensor::init(){
@@ -26,6 +27,27 @@ void MainbotSensor::initIMU(){
 
 void MainbotSensor::updateIMU(){
 	imu_.update();
+}
+
+void MainbotSensor::updateIMUinit(){
+  imu_.SEN.acc_cali_start();
+  while(imu_.SEN.acc_cali_get_done()==false){
+    imu_.update();
+  }
+}
+void MainbotSensor::euler_to_quat(double* q){
+    float c1 = cos((imu_.rpy[1]*3.14/180.0)/2);
+    float c2 = cos((imu_.rpy[2]*3.14/180.0)/2);
+    float c3 = cos((imu_.rpy[0]*3.14/180.0)/2);
+
+    float s1 = sin((imu_.rpy[1]*3.14/180.0)/2);
+    float s2 = sin((imu_.rpy[2]*3.14/180.0)/2);
+    float s3 = sin((imu_.rpy[0]*3.14/180.0)/2);
+
+    q[0] = c1 * c2 * c3 - s1 * s2 * s3;
+    q[1] = s1 * s2 * c3 + c1 * c2 * s3;
+    q[2] = s1 * c2 * c3 + c1 * s2 * s3;
+    q[3] = c1 * s2 * c3 - s1 * c2 * s3;
 }
 
 void MainbotSensor::calibrationGyro(){
@@ -56,40 +78,7 @@ void MainbotSensor::calibrationGyro(){
   }
 }
 
-float* MainbotSensor::getImuAngularVelocity(void)
-{
-  static float angular_vel[3];
-
-  angular_vel[0] = imu_.SEN.gyroADC[0] * GYRO_FACTOR;
-  angular_vel[1] = imu_.SEN.gyroADC[1] * GYRO_FACTOR;
-  angular_vel[2] = imu_.SEN.gyroADC[2] * GYRO_FACTOR;
-
-  return angular_vel;
-}
-
-float* MainbotSensor::getImuLinearAcc(void)
-{
-  static float linear_acc[3];
-
-  linear_acc[0] = imu_.SEN.accADC[0] * ACCEL_FACTOR;
-  linear_acc[1] = imu_.SEN.accADC[1] * ACCEL_FACTOR;
-  linear_acc[2] = imu_.SEN.accADC[2] * ACCEL_FACTOR;
-
-  return linear_acc;
-}
-
-float* MainbotSensor::getImuMagnetic(void)
-{
-  static float magnetic[3];
-
-  magnetic[0] = imu_.SEN.magADC[0] * MAG_FACTOR;
-  magnetic[1] = imu_.SEN.magADC[1] * MAG_FACTOR;
-  magnetic[2] = imu_.SEN.magADC[2] * MAG_FACTOR;
-
-  return magnetic;
-}
-
-sensor_msgs::Imu MainbotSensor::getIMU(void)
+sensor_msgs__msg__Imu MainbotSensor::getIMU(void)
 {
   imu_msg_.angular_velocity.x = imu_.SEN.gyroADC[0] * GYRO_FACTOR;
   imu_msg_.angular_velocity.y = imu_.SEN.gyroADC[1] * GYRO_FACTOR;
@@ -148,7 +137,7 @@ float* MainbotSensor::getOrientation(void)
   return orientation;
 }
 
-sensor_msgs::MagneticField MainbotSensor::getMag(void)
+sensor_msgs__msg__MagneticField MainbotSensor::getMag(void)
 {
   mag_msg_.magnetic_field.x = imu_.SEN.magADC[0] * MAG_FACTOR;
   mag_msg_.magnetic_field.y = imu_.SEN.magADC[1] * MAG_FACTOR;
