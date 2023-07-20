@@ -62,12 +62,12 @@ class MainbotMotorDriver{
 		void doBL_Motor(bool dir, int vel);
 		float angle_vel(int *encoderPos);
 		void Stop();
-		void control_vel(float Vx, float Vy, float W);
+		void control_vel(double Vx, double Vy, double W);
 		void view_angVel();
 		void view_encoderPos();
-			
 
-		
+
+
 
 	private:
 		float ratio;

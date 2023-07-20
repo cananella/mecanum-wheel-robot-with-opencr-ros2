@@ -12,7 +12,7 @@ float BL_angelVel;
 
 
 MainbotMotorDriver::MainbotMotorDriver(){
-  
+
 	ratio = 360./90./12./2.;
 
 	FR_encoderPos = 0;
@@ -60,7 +60,7 @@ void MainbotMotorDriver::init(){
 	pinMode(FR_ENCODER_PIN_C2,INPUT_PULLUP);
 	pinMode(FL_ENCODER_PIN_C1,INPUT_PULLUP);
 	pinMode(FL_ENCODER_PIN_C2,INPUT_PULLUP);
-	
+
 	pinMode(BR_ENCODER_PIN_C1,INPUT_PULLUP);
 	pinMode(BR_ENCODER_PIN_C2,INPUT_PULLUP);
 	pinMode(BL_ENCODER_PIN_C1,INPUT_PULLUP);
@@ -70,7 +70,7 @@ void MainbotMotorDriver::init(){
 	attachInterrupt(digitalPinToInterrupt(FL_ENCODER_PIN_C2), doEncoderFL, CHANGE);
 	attachInterrupt(digitalPinToInterrupt(BR_ENCODER_PIN_C2), doEncoderBR, CHANGE);
 	attachInterrupt(digitalPinToInterrupt(BL_ENCODER_PIN_C2), doEncoderBL, CHANGE);
-  
+
 }
 
 void doEncoderFR(){
@@ -110,7 +110,7 @@ void MainbotMotorDriver::doBL_Motor(bool dir, int vel){
 float MainbotMotorDriver::angle_vel(int *encoderPos){
   float t1=millis();
   int deg1=*encoderPos;
-  delay(5);
+  delay(8);
   float t2=millis();
   int deg2=*encoderPos;
   float angle_vel= (deg2-deg1)*ratio*1000.*DEGTORED/((t2-t1));
@@ -133,30 +133,30 @@ void MainbotMotorDriver::Stop(){
 }
 
 
-void MainbotMotorDriver::control_vel(float Vx, float Vy, float W){
-  //vel 0.059~0.23
-  if(Vx == 0 && Vy == 0 && W == 0) {
-    Stop();
+void MainbotMotorDriver::control_vel(double Vx, double Vy, double W){
+  //vel 0.06~0.23
+  if(Vx == 0.0 && Vy == 0.0 && W == 0.0) {
+    this->Stop();
   }
   else{
     BR_targetVel = (Vx - Vy - (l1+l2)*W)/R;
-    FR_targetVel = (Vx + Vy - (l1+l2)*W)/R; 
-    FL_targetVel = (Vx - Vy + (l1+l2)*W)/R; 
-    BL_targetVel = (Vx + Vy + (l1+l2)*W)/R;  
+    FR_targetVel = (Vx + Vy - (l1+l2)*W)/R;
+    FL_targetVel = (Vx - Vy + (l1+l2)*W)/R;
+    BL_targetVel = (Vx + Vy + (l1+l2)*W)/R;
   }
   bool FR_done_flag=false;
   bool FL_done_flag=false;
   bool BL_done_flag=false;
   bool BR_done_flag=false;
-  float angVel_error = 0.8;
-  float minAngVel=1.43;
-  
+  float angVel_error = 0.400;
+  float minAngVel=1.4300;
+
   while(!(FR_done_flag && FL_done_flag && BR_done_flag && BL_done_flag)){
     FR_angelVel = angle_vel(&FR_encoderPos);
     FL_angelVel = angle_vel(&FL_encoderPos);
     BR_angelVel = angle_vel(&BR_encoderPos);
     BL_angelVel = angle_vel(&BL_encoderPos);
-    
+
     if (FR_targetVel<-minAngVel && !FR_done_flag){
       if (FR_targetVel<FR_angelVel && FR_wight<105){
         FR_wight++;
@@ -189,7 +189,8 @@ void MainbotMotorDriver::control_vel(float Vx, float Vy, float W){
       doFR_Motor(LOW,0);
       FR_done_flag=true;
     }
-    
+
+
     if (FL_targetVel < -minAngVel && !FL_done_flag) {
       if (FL_targetVel < FL_angelVel  && FL_wight<105) {
         FL_wight++;
@@ -222,7 +223,8 @@ void MainbotMotorDriver::control_vel(float Vx, float Vy, float W){
       doFL_Motor(LOW,0);
       FL_done_flag=true;
     }
-    
+
+
     if (BR_targetVel<-minAngVel && !BR_done_flag){
       if (BR_targetVel<BR_angelVel && BR_wight<105 ){
         BR_wight++;
@@ -255,7 +257,8 @@ void MainbotMotorDriver::control_vel(float Vx, float Vy, float W){
       doBR_Motor(LOW,0);
       BR_done_flag=true;
     }
-    
+
+
     if (BL_targetVel < -minAngVel && !BL_done_flag) {
       if (BL_targetVel < BL_angelVel && BL_wight<105) {
         BL_wight++;
@@ -288,7 +291,7 @@ void MainbotMotorDriver::control_vel(float Vx, float Vy, float W){
       doBL_Motor(LOW,0);
       BL_done_flag=true;
     }
-  } 
+  }
   //DEBUG_SERIAL.println("motordone");
 }
 

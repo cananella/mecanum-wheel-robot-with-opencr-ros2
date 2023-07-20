@@ -12,12 +12,12 @@ bool MainbotSensor::init(){
 	DEBUG_SERIAL.begin(57600);
 	uint8_t get_error_code = 0x00;
 	get_error_code = imu_.begin();
-	
+
 	if (get_error_code != 0x00)
     	DEBUG_SERIAL.println("Failed to init Sensor");
   	else
     	DEBUG_SERIAL.println("Success to init Sensor");
-	
+
 	return get_error_code;
 }
 
@@ -34,7 +34,15 @@ void MainbotSensor::updateIMUinit(){
   while(imu_.SEN.acc_cali_get_done()==false){
     imu_.update();
   }
+
+  imu_msg_.header.frame_id.data = (char*)malloc(100*sizeof(char));
+  char string1[] = "/main_bot_imu";
+  memcpy(imu_msg_.header.frame_id.data , string1, strlen(string1) + 1);
+  imu_msg_.header.frame_id.size = strlen(imu_msg_.header.frame_id.data );
+  imu_msg_.header.frame_id.capacity = 100;
+
 }
+
 void MainbotSensor::euler_to_quat(double* q){
     float c1 = cos((imu_.rpy[1]*3.14/180.0)/2);
     float c2 = cos((imu_.rpy[2]*3.14/180.0)/2);
@@ -51,14 +59,14 @@ void MainbotSensor::euler_to_quat(double* q){
 }
 
 void MainbotSensor::calibrationGyro(){
-	
+
   uint32_t pre_time;
   uint32_t t_time;
 
   const uint8_t led_ros_connect = 3;
 
   imu_.SEN.gyro_cali_start();
-  
+
   t_time   = millis();
   pre_time = millis();
 
